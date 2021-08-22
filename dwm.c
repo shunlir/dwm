@@ -1608,8 +1608,15 @@ seturgent(Client *c, int urg)
 
 	c->isurgent = urg;
 	if (!(wmh = XGetWMHints(dpy, c->win)))
+	{
+		/* Some apps (such as chrominum, brave) doesn't have WM_HINTS set, draw bar
+		 * so that tag color will change immediately */
+		if (urg)
+			drawbars();
 		return;
+	}
 	wmh->flags = urg ? (wmh->flags | XUrgencyHint) : (wmh->flags & ~XUrgencyHint);
+	/* TODO: https://github.com/awesomeWM/awesome/commit/64748671cd8de154092be76e28b4a06080712d76 */
 	XSetWMHints(dpy, c->win, wmh);
 	XFree(wmh);
 }
